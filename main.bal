@@ -6,19 +6,27 @@ public function main() returns error? {
 
 
     http:Client cl = check new("https://disease.sh/v3/");
-    json[] data = check cl -> get("covid-19/countries");
+    CountryData[] data = check cl -> get("covid-19/countries");
 
 
-    CasePerPerson[] data2 = [];
-    foreach CountryData item in data {
-        int casePerPerson = <int> decimal:ceiling( <decimal> item.population / <decimal> item.cases);
-        CasePerPerson c = { country : item.country, casePerPerson : casePerPerson};
+    // CasePerPerson[] data2 = [];
+    // foreach CountryData item in data {
+    //     int casePerPerson = <int> decimal:ceiling( <decimal> item.population / <decimal> item.cases);
+    //     CasePerPerson c = { country : item.country, casePerPerson : casePerPerson};
 
-        data2.push(c);
-    }
+    //     data2.push(c);
+    // }
+
+
+            CasePerPerson[] data3 = from CountryData {country, cases, population} in data
+            let int casePerPerson = <int> decimal:ceiling( <decimal> population / <decimal> cases)
+            select { country : country, casePerPerson : casePerPerson};
+
+            foreach CasePerPerson i in data3 {
+                io:println(i);
+            }
     
-    io:println(data[0].country);
-    io:println(data2);
+   
 }
 
 
